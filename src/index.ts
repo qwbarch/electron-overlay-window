@@ -1,8 +1,8 @@
-import { EventEmitter } from 'node:events'
-import { join } from 'node:path'
-import { throttle } from 'throttle-debounce'
-import { screen } from 'electron'
-import { BrowserWindow, Rectangle, BrowserWindowConstructorOptions } from 'electron'
+import {EventEmitter} from 'node:events'
+import {join} from 'node:path'
+import {throttle} from 'throttle-debounce'
+import {screen} from 'electron'
+import {BrowserWindow, Rectangle, BrowserWindowConstructorOptions} from 'electron'
 const lib: AddonExports = require('node-gyp-build')(join(__dirname, '..'))
 
 interface AddonExports {
@@ -73,7 +73,7 @@ class OverlayControllerGlobal {
   private electronWindow?: BrowserWindow
   // Exposed so that apps can get the current bounds of the target
   // NOTE: stores screen physical rect on Windows
-  targetBounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 }
+  targetBounds: Rectangle = {x: 0, y: 0, width: 0, height: 0}
   targetHasFocus = false
   private focusNext: 'overlay' | 'target' | undefined
   // The height of a title bar on a standard window. Only measured on Mac
@@ -82,7 +82,7 @@ class OverlayControllerGlobal {
 
   readonly events = new EventEmitter()
 
-  constructor () {
+  constructor() {
     this.events.on('attach', (e: AttachEvent) => {
       this.targetHasFocus = true
       if (this.electronWindow) {
@@ -145,7 +145,7 @@ class OverlayControllerGlobal {
       // fullscreen. We get around it by making it display on all workspaces,
       // based on code from:
       // https://github.com/electron/electron/issues/10078#issuecomment-754105005
-      this.electronWindow.setVisibleOnAllWorkspaces(isFullscreen, { visibleOnFullScreen: true })
+      this.electronWindow.setVisibleOnAllWorkspaces(isFullscreen, {visibleOnFullScreen: true})
       if (isFullscreen) {
         const display = screen.getPrimaryDisplay()
         this.electronWindow.setBounds(display.bounds)
@@ -158,7 +158,7 @@ class OverlayControllerGlobal {
     }
   }
 
-  private updateOverlayBounds () {
+  private updateOverlayBounds() {
     let lastBounds = this.adjustBoundsForMacTitleBar(this.targetBounds)
     if (lastBounds.width === 0 || lastBounds.height === 0) return
     if (!this.electronWindow) return
@@ -176,8 +176,8 @@ class OverlayControllerGlobal {
     }
   }
 
-  private handler (e: unknown) {
-    switch ((e as { type: EventType }).type) {
+  private handler(e: unknown) {
+    switch ((e as {type: EventType}).type) {
       case EventType.EVENT_ATTACH:
         this.events.emit('attach', e)
         break
@@ -204,7 +204,7 @@ class OverlayControllerGlobal {
    * the title bar height to adjust the size of the overlay to not overlap
    * the title bar. This helps Mac match the behaviour on Windows/Linux.
    */
-  private calculateMacTitleBarHeight () {
+  private calculateMacTitleBarHeight() {
     const testWindow = new BrowserWindow({
       width: 400,
       height: 300,
@@ -220,7 +220,7 @@ class OverlayControllerGlobal {
   }
 
   /** If we're on a Mac, adjust the bounds to not overlap the title bar */
-  private adjustBoundsForMacTitleBar (bounds: Rectangle) {
+  private adjustBoundsForMacTitleBar(bounds: Rectangle) {
     if (!isMac || !this.attachOptions.hasTitleBarOnMac) {
       return bounds
     }
@@ -233,7 +233,7 @@ class OverlayControllerGlobal {
     return newBounds
   }
 
-  activateOverlay () {
+  activateOverlay() {
     if (!this.electronWindow) {
       throw new Error('You are using the library in tracking mode')
     }
@@ -242,13 +242,13 @@ class OverlayControllerGlobal {
     this.electronWindow.focus()
   }
 
-  focusTarget () {
+  focusTarget() {
     this.focusNext = 'target'
     this.electronWindow?.setIgnoreMouseEvents(true)
     lib.focusTarget()
   }
 
-  attachByTitle (electronWindow: BrowserWindow | undefined, targetWindowTitle: string, options: AttachOptions = {}) {
+  attachByTitle(electronWindow: BrowserWindow | undefined, targetWindowTitle: string, options: AttachOptions = {}) {
     if (this.isInitialized) {
       throw new Error('Library can be initialized only once.')
     } else {
@@ -278,8 +278,8 @@ class OverlayControllerGlobal {
   }
 
   // buffer suitable for use in `nativeImage.createFromBitmap`
-  screenshot (): Buffer {
-    if (process.platform !== 'win32') {
+  screenshot(): Buffer {
+    if (process.platform !== 'win32' && process.platform !== 'linux') {
       throw new Error('Not implemented on your platform.')
     }
     return lib.screenshot()

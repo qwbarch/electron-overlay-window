@@ -40,7 +40,6 @@
     "typescript": "5.x.x"
   },
   "dependencies": {
-    "electron-overlay-window": "https://github.com/qwbarch/electron-overlay-window",
     "node-gyp-build": "4.x.x",
     "throttle-debounce": "5.x.x"
   },
